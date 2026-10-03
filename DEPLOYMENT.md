@@ -42,7 +42,7 @@ once — as *either* a model *or* a Space. Only the model repo exists on the Hub
 3. Open **Advanced settings** and set:
    - **Main file path**: `streamlit_app/app.py`
    - **Python version**: `3.10`
-   - **Requirements file**: `deployment/requirements_app.txt`
+   - **Requirements file**: leave it as `requirements.txt`
 4. **Deploy**.
 
 The model id `Mirianuli/genaimitproject` is built into `config/config.py`, so nothing else is
@@ -51,12 +51,22 @@ required. To point a fork at a different model repo, add an environment variable
 
 The app reports which model it loaded in the sidebar (`Model source: HuggingFace Hub (Mirianuli/genaimitproject)`).
 
-### Why a separate requirements file
+### Why requirements.txt is CPU-pinned
 
-`deployment/requirements_app.txt` pins the CPU-only PyTorch wheel via
-`--extra-index-url https://download.pytorch.org/whl/cpu`. The default PyPI wheel bundles roughly
-2.5 GB of CUDA libraries that the free container cannot store. It also drops `datasets`,
-`evaluate` and `accelerate`, which only the training notebook needs.
+The root `requirements.txt` is what Streamlit Community Cloud installs by default, and it pins
+the CPU-only PyTorch wheel:
+
+```
+--extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+Without that line pip resolves the default PyPI `torch` wheel, which drags in roughly 2.5 GB of
+CUDA libraries. The free container does not have the disk for that, and the build dies before
+the app ever starts. Training-only packages (`datasets`, `accelerate`, `evaluate`, `seaborn`,
+`tqdm`) were moved to `requirements_train.txt` so they are not installed on the host.
+
+**If you hit an install error, read the deployment log.** Streamlit prints the failing package
+and the reason before the error page appears.
 
 ### Memory note
 
@@ -110,18 +120,22 @@ git push mit master
 
 ## Running locally instead
 
-No HuggingFace needed. Train the model so that `models/phishing_model/config.json` exists,
-then:
-
 ```powershell
+pip install -r requirements.txt   # or requirements_train.txt for training work
 streamlit run streamlit_app/app.py
 ```
 
 The loader prefers local weights and falls back to the Hub only when they are absent:
 
 1. `models/phishing_model/config.json` present → use local files
-2. else `HF_MODEL_ID` set → download from the Hub and cache
+2. else `HF_MODEL_ID` set (built-in default is `Mirianuli/genaimitproject`) → download from the Hub and cache
 3. else → keyword fallback, clearly labelled in the UI
+
+To work fully offline, download the Hub repo once and drop it into `models/`:
+
+```powershell
+hf download Mirianuli/genaimitproject --local-dir models/hub_model
+```
 
 ---
 

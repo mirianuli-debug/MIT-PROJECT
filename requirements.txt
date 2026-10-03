@@ -1,31 +1,38 @@
-# GenAI Phishing Detector - Dependencies
-# Compatible with Python 3.9+ and HuggingFace Spaces (CPU)
+# Runtime dependencies for the Streamlit app.
+#
+# This file is what Streamlit Community Cloud picks by default, so it must stay
+# small enough to install on a free CPU container. Two things matter here:
+#
+#   1. The CPU-only PyTorch index. Without it pip pulls the default PyPI wheel,
+#      which bundles roughly 2.5 GB of CUDA libraries and blows the free
+#      container's disk quota, failing the build with an opaque error.
+#
+#   2. Training-only packages (datasets, accelerate, evaluate, seaborn, tqdm)
+#      are deliberately absent. The app never imports them and they slow the
+#      install down. Use requirements_train.txt for local training and for the
+#      Colab notebooks.
+#
+# CPU-only PyTorch wheel:
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Web app
+streamlit>=1.25.0,<2.0.0
 
 # Core ML
 torch>=2.0.0,<3.0.0
-
-# HuggingFace
 transformers>=4.30.0,<5.0.0
-datasets>=2.12.0,<3.0.0
-evaluate>=0.4.0,<1.0.0
-accelerate>=0.20.0,<1.0.0
 
 # Explainability
 shap>=0.41.0,<1.0.0
 
 # Data processing
-pandas>=1.5.0,<2.0.0
 numpy>=1.24.0,<2.0.0
+pandas>=1.5.0,<3.0.0
 scikit-learn>=1.2.0,<2.0.0
-
-# Web app
-streamlit>=1.25.0,<2.0.0
 
 # Visualization
 matplotlib>=3.7.0,<4.0.0
-seaborn>=0.12.0,<1.0.0
 
-# Utilities
-tqdm>=4.65.0,<5.0.0
+# Transformers runtime
+protobuf>=3.20.0,<5.0.0
 sentencepiece>=0.1.99,<1.0.0
-protobuf>=3.20.0,<4.0.0

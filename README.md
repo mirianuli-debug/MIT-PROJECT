@@ -165,7 +165,8 @@ source venv/bin/activate  # Linux/Mac
 # venv\Scripts\activate   # Windows
 
 # Install dependencies
-pip install -r requirements.txt
+# requirements.txt covers the app; use requirements_train.txt for training/eval
+pip install -r requirements_train.txt
 
 # Generate dataset
 python dataset/generate_dataset.py
@@ -284,7 +285,8 @@ python deployment/setup_hf_spaces.py
 
 2. **Upload Files:**
    ```
-   requirements.txt
+requirements.txt
+requirements_train.txt
    packages.txt
    streamlit_app/
    config/
