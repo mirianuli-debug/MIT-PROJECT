@@ -31,6 +31,7 @@ from config.config import (
     STREAMLIT_ICON,
     MODEL_SAVE_DIR,
     TOKENIZER_SAVE_DIR,
+    HF_MODEL_ID,
     CLASS_NAMES,
     CLASS_MAPPING,
 )
@@ -72,22 +73,29 @@ def load_explainer() -> Optional[PhishingExplainer]:
     model_path = str(MODEL_SAVE_DIR)
     tokenizer_path = str(TOKENIZER_SAVE_DIR)
 
-    # Check if model exists locally
-    if not (Path(model_path) / "config.json").exists():
+    # Resolve where the weights come from: local disk first, then the Hub.
+    if (Path(model_path) / "config.json").exists():
+        st.caption(f"Model source: local ({model_path})")
+    elif HF_MODEL_ID:
+        # The Hub repo carries the model, the tokenizer and config in one place.
+        model_path = tokenizer_path = HF_MODEL_ID
+        st.caption(f"Model source: HuggingFace Hub ({HF_MODEL_ID})")
+    else:
         st.warning(
-            "Trained model not found locally. "
-            "Please train the model first using train.py or download from HuggingFace Hub. "
-            "The app will use a fallback mode for demonstration."
+            "Trained model not found. Set the HF_MODEL_ID environment variable to "
+            "the HuggingFace Hub repo holding the weights, or train the model with "
+            "train.py. Running in demonstration mode."
         )
         return None
 
     try:
-        explainer = PhishingExplainer(
-            model_path=model_path,
-            tokenizer_path=tokenizer_path,
-            max_evals=50,  # Reduced for web app speed
-            background_size=30,
-        )
+        with st.spinner("Loading model ..."):
+            explainer = PhishingExplainer(
+                model_path=model_path,
+                tokenizer_path=tokenizer_path,
+                max_evals=50,  # Reduced for web app speed
+                background_size=30,
+            )
         return explainer
     except Exception as e:
         st.error(f"Failed to load model: {e}")

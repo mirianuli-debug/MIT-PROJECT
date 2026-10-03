@@ -196,7 +196,7 @@ pip install huggingface-hub
 huggingface-cli login
 
 # Clone the empty space
-git clone https://huggingface.co/spaces/YOUR_USERNAME/genai-phishing-detector
+git clone https://huggingface.co/spaces/mirianuli-debug/genai-phishing-detector
 cd genai-phishing-detector
 
 # Copy your project files
@@ -229,7 +229,7 @@ You can watch the build progress in the **Builder** tab. It takes about 3-5 minu
 ### 4.1 App URL
 
 ```
-https://YOUR_USERNAME-genai-phishing-detector.hf.space
+https://mirianuli--genai-phishing-detector.hf.space
 ```
 
 For example, if your username is `john`, the URL is:
@@ -241,7 +241,9 @@ https://john-genai-phishing-detector.hf.space
 
 When you paste a message and click **Analyze**:
 
-1. The app loads the trained DistilBERT model from `models/phishing_model/`
+1. The app loads the trained DistilBERT model from `models/phishing_model/`, or
+   from the HuggingFace Hub repo named by the `HF_MODEL_ID` environment variable
+   when running on a Space
 2. Tokenizes your text using the DistilBERT tokenizer
 3. Runs the model to get class probabilities
 4. Runs SHAP to identify which words influenced the prediction
@@ -357,7 +359,7 @@ Free HuggingFace Spaces go to sleep after 48 hours of inactivity. When someone v
 │     └── Wait 3-5 min for build                                       │
 │                                                                      │
 │  4. DONE 🎉                                                          │
-│     └── https://YOUR_USERNAME-genai-phishing-detector.hf.space       │
+│     └── https://mirianuli--genai-phishing-detector.hf.space       │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```

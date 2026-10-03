@@ -38,6 +38,17 @@ PREPROCESSED_DATASET_CSV: Path = DATASET_DIR / "preprocessed_dataset.csv"
 MODEL_SAVE_DIR: Path = MODELS_DIR / "phishing_model"
 TOKENIZER_SAVE_DIR: Path = MODELS_DIR / "tokenizer"
 
+# ---------------------------------------------------------------------------
+# HuggingFace Hub (deployment)
+# ---------------------------------------------------------------------------
+# The fine-tuned weights (~255 MB) are far too large for git, so they are hosted
+# on the HuggingFace Hub and never committed. Point HF_MODEL_ID at that repo and
+# the app downloads the weights on first run and caches them locally.
+#
+# Override without editing code (used by the HuggingFace Space):
+#   HF_MODEL_ID=mirianuli-debug/genai-phishing-detector
+HF_MODEL_ID: str = os.environ.get("HF_MODEL_ID", "").strip()
+
 # Evaluation artifacts
 EVAL_REPORT_DIR: Path = EVALUATION_DIR / "reports"
 EVAL_FIGURES_DIR: Path = EVALUATION_DIR / "figures"

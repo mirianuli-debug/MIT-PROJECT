@@ -930,7 +930,7 @@ genai-phishing-detector/
 14.1 Local Development Setup
 
   # Clone repository
-  git clone https://github.com/YOUR_USERNAME/genai-phishing-detector.git
+  git clone https://github.com/mirianuli-debug/MIT-PROJECT.git
   cd genai-phishing-detector
 
   # Create virtual environment
@@ -1022,7 +1022,7 @@ genai-phishing-detector/
       models/tokenizer/special_tokens_map.json
 
   Step 5: Wait for build (3-5 minutes, visible in Builder tab)
-  Step 6: Access at https://YOUR_USERNAME-genai-phishing-detector.hf.space
+  Step 6: Access at https://mirianuli--genai-phishing-detector.hf.space
 
   README.md must start with:
   ---

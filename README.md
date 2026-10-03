@@ -154,7 +154,7 @@ GTBank · UBA · Access Bank · Zenith Bank · Fidelity Bank · First Bank · Mo
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/genai-phishing-detector.git
+git clone https://github.com/mirianuli-debug/MIT-PROJECT.git
 cd genai-phishing-detector
 
 # Create virtual environment
@@ -171,7 +171,7 @@ python dataset/generate_dataset.py
 
 ### Training (Google Colab)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/genai-phishing-detector/blob/main/notebooks/training_notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mirianuli-debug/genai-phishing-detector/blob/main/notebooks/training_notebook.ipynb)
 
 1. Open the notebook in Colab
 2. Run all cells (T4 GPU recommended)
@@ -346,7 +346,7 @@ gh repo create genai-phishing-detector --public
 
 # Push
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/genai-phishing-detector.git
+git remote add origin https://github.com/mirianuli-debug/MIT-PROJECT.git
 git push -u origin main
 ```
 
@@ -433,7 +433,7 @@ MIT License — see [LICENSE](LICENSE) for details.
            Financial Sector},
   year = {2025},
   publisher = {GitHub},
-  url = {https://github.com/YOUR_USERNAME/genai-phishing-detector}
+  url = {https://github.com/mirianuli-debug/MIT-PROJECT}
 }
 ```
 

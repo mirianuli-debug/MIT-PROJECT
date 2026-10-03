@@ -31,7 +31,7 @@ phishing attacks in the Nigerian financial sector.
 ## Training
 
 Train the model using Google Colab:
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/genai-phishing-detector/blob/main/notebooks/training_notebook.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mirianuli-debug/genai-phishing-detector/blob/main/notebooks/training_notebook.ipynb)
 
 ## Evaluation
 
