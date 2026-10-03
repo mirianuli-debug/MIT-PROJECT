@@ -8,6 +8,8 @@ sdk_version: 1.25.0
 python_version: "3.10"
 app_file: streamlit_app/app.py
 pinned: false
+variables:
+  HF_MODEL_ID: "mirianuli-debug/genaimitproject"
 ---
 
 # GenAI Phishing Detector 🛡️

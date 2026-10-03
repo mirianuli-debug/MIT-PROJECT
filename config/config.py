@@ -45,8 +45,9 @@ TOKENIZER_SAVE_DIR: Path = MODELS_DIR / "tokenizer"
 # on the HuggingFace Hub and never committed. Point HF_MODEL_ID at that repo and
 # the app downloads the weights on first run and caches them locally.
 #
-# Override without editing code (used by the HuggingFace Space):
-#   HF_MODEL_ID=mirianuli-debug/genai-phishing-detector
+# Override without editing code (the HuggingFace Space sets this from the
+# `variables:` block in README.md):
+#   HF_MODEL_ID=mirianuli-debug/genaimitproject
 HF_MODEL_ID: str = os.environ.get("HF_MODEL_ID", "").strip()
 
 # Evaluation artifacts
