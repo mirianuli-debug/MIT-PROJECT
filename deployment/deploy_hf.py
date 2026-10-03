@@ -69,7 +69,7 @@ from transformers import pipeline
 
 classifier = pipeline(
     "text-classification",
-    model="mirianuli-debug/genaimitproject",
+    model="Mirianuli/genaimitproject",
     truncation=True,
     max_length=128,
 )

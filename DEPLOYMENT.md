@@ -5,88 +5,105 @@ Two repos, two platforms:
 | What | Where | Contents |
 |------|-------|----------|
 | Source code | `github.com/mirianuli-debug/MIT-PROJECT` | all code, notebooks, docs. **No model weights.** |
-| Model weights | `huggingface.co/<user>/genaimitproject` | `config.json`, `model.safetensors` (~255 MB), tokenizer, model card |
-| Live app | `huggingface.co/spaces/<user>/genaimitproject-demo` | Streamlit UI, CPU basic hardware |
+| Model weights | `huggingface.co/Mirianuli/genaimitproject` | `config.json`, `model.safetensors` (~255 MB), tokenizer, model card |
+| Live app | Streamlit Community Cloud | Streamlit UI, downloads weights from the Hub at runtime |
 
-The weights are ~255 MB, far beyond git's limits, so they live only on the HuggingFace Hub. The Space downloads them at runtime using the `HF_MODEL_ID` variable declared in the front-matter of `README.md`.
-
----
-
-## Why the Space repo is named `genaimitproject-demo`
-
-HuggingFace namespaces are shared across repo types, so `<user>/genaimitproject` can only exist once — as *either* a model *or* a Space. The model repo takes the plain name and the app gets the `-demo` suffix.
+The weights are ~255 MB, far beyond git's limits, so they live only on the HuggingFace Hub. The app downloads them at runtime using the `HF_MODEL_ID` variable declared in the front-matter of `README.md`.
 
 ---
 
-## One-time setup
+## Why the app is not on a HuggingFace Space
 
-### 1. Create a Hugging Face token
+HuggingFace now routes Streamlit Spaces through Docker, and the Hub's free tier no longer includes
+CPU hardware for dynamic Spaces. Creating one returns:
 
-1. Go to <https://huggingface.co/settings/tokens>
-2. Click **+ Create new token**
-3. Choose the **Write** role (needed to create repos and upload files)
-4. Copy it — you will only see it once
-
-### 2. Install the Hub library
-
-```powershell
-py -m pip install huggingface_hub
+```
+402 Payment Required
+Static Spaces are free for everyone, but hosting Gradio and Docker Spaces
+on free cpu-basic requires a PRO subscription.
 ```
 
-### 3. Run the deployment script
+Verified on 2026-10-03: `sdk: static` succeeds, `sdk: streamlit` and `sdk: docker` both return 402.
+Streamlit Community Cloud is used instead, which is free.
+
+---
+
+## Why the Space-style repo name is not used
+
+HuggingFace namespaces are shared across repo types, so `<user>/genaimitproject` can only exist
+once — as *either* a model *or* a Space. Only the model repo exists on the Hub.
+
+---
+
+## Deploy the app to Streamlit Community Cloud
+
+1. Go to <https://share.streamlit.io> and sign in with GitHub.
+2. **New app** → pick the repository `mirianuli-debug/MIT-PROJECT`, branch `master`.
+3. Open **Advanced settings** and set:
+   - **Main file path**: `streamlit_app/app.py`
+   - **Python version**: `3.10`
+   - **Requirements file**: `deployment/requirements_app.txt`
+4. **Deploy**.
+
+The model id `Mirianuli/genaimitproject` is built into `config/config.py`, so nothing else is
+required. To point a fork at a different model repo, add an environment variable
+`HF_MODEL_ID=<user>/<repo>` in the same Advanced settings panel; the env var always wins.
+
+The app reports which model it loaded in the sidebar (`Model source: HuggingFace Hub (Mirianuli/genaimitproject)`).
+
+### Why a separate requirements file
+
+`deployment/requirements_app.txt` pins the CPU-only PyTorch wheel via
+`--extra-index-url https://download.pytorch.org/whl/cpu`. The default PyPI wheel bundles roughly
+2.5 GB of CUDA libraries that the free container cannot store. It also drops `datasets`,
+`evaluate` and `accelerate`, which only the training notebook needs.
+
+### Memory note
+
+The free container has roughly 1 GB of RAM, and the model alone is ~255 MB. SHAP attribution is
+far more expensive than inference, so `explain(..., use_shap=False)` is wired in as a fallback:
+if SHAP runs out of memory the app still returns the prediction and says so, instead of failing.
+To reduce memory further, lower `max_evals` and `background_size` in
+`streamlit_app/app.py` (`load_explainer`), or convert the weights to float16 and upload them again.
+
+---
+
+## One-time setup (already done)
+
+The HuggingFace model repo is live and public:
 
 ```powershell
-$env:HF_TOKEN = "hf_xxxxxxxxxxxxxxxxxxxx"
-py deployment/deploy_hf.py --user <your-hf-username>
+$env:HF_TOKEN = "<your hf write token>"
+py deployment/deploy_hf.py --user Mirianuli
 ```
 
-The script:
-- verifies `models/phishing_model/` and `models/tokenizer/` are complete
-- creates the model repo and uploads the weights, tokenizer and model card
-- creates the Space repo (Streamlit SDK)
-
-### 4. Push the app code to the Space
-
-```powershell
-git remote add hf https://huggingface.co/spaces/<your-hf-username>/genaimitproject-demo
-git push hf master
-```
-
-### 5. Confirm the variable
-
-The Space reads `HF_MODEL_ID` from the `variables:` block in `README.md`. Verify it
-names your model repo, then check the build log:
-
-- <https://huggingface.co/spaces/<your-hf-username>/genaimitproject-demo>
-- Live app: <https://<your-hf-username>--genaimitproject-demo.hf.space>
+This verifies `models/phishing_model/` and `models/tokenizer/` are complete, creates the model
+repo and uploads the weights, tokenizer and model card.
 
 ---
 
 ## Updating the model later
 
-Upload new weights to the same model repo; the Space picks them up on restart.
+Upload new weights to the same model repo, then restart the app.
 
 ```powershell
-py deployment/deploy_hf.py --user <your-hf-username> --skip-model
+hf upload Mirianuli/genaimitproject models/phishing_model/model.safetensors model.safetensors
+hf upload Mirianuli/genaimitproject models/phishing_model/config.json config.json
+hf upload Mirianuli/genaimitproject models/tokenizer/tokenizer.json tokenizer.json
+hf upload Mirianuli/genaimitproject models/tokenizer/tokenizer_config.json tokenizer_config.json
 ```
 
-or upload just the weights by hand:
-
-```powershell
-hf upload <your-hf-username>/genaimitproject models/phishing_model/config.json config.json
-hf upload <your-hf-username>/genaimitproject models/phishing_model/model.safetensors model.safetensors
-hf upload <your-hf-username>/genaimitproject models/tokenizer/tokenizer.json tokenizer.json
-hf upload <your-hf-username>/genaimitproject models/tokenizer/tokenizer_config.json tokenizer_config.json
-```
-
-Then restart the Space from its **Settings → Restart** button.
+The deployment host caches the download, so it must be restarted to pick up new weights.
 
 ---
 
 ## Updating the app code later
 
+Push to GitHub — Streamlit Community Cloud redeploys automatically on every push to the
+deployed branch.
+
 ```powershell
-git push hf master
+git push mit master
 ```
 
 ---

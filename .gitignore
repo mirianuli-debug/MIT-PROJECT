@@ -31,8 +31,9 @@ Thumbs.db
 # Jupyter checkpoints
 .ipynb_checkpoints/
 
-# Streamlit
-.streamlit/
+# Streamlit (keep the deployed config, never commit credentials)
+.streamlit/secrets.toml
+.streamlit/credentials.toml
 
 # Evaluation outputs
 evaluation/figures/*

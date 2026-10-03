@@ -298,8 +298,17 @@ if analyze_clicked and input_text.strip():
             try:
                 result = explainer.explain(input_text, top_k=10)
             except Exception as e:
-                st.error(f"Analysis failed: {e}")
-                st.stop()
+                # SHAP attribution is the memory-hungry part of this pipeline.
+                # If it cannot run on this host, still show the prediction.
+                st.warning(
+                    f"Word-level explanation unavailable ({type(e).__name__}). "
+                    "Showing the prediction without SHAP attributions."
+                )
+                try:
+                    result = explainer.explain(input_text, top_k=0, use_shap=False)
+                except Exception as e2:
+                    st.error(f"Analysis failed: {e2}")
+                    st.stop()
         else:
             # Fallback: simple heuristic demo when model is not available
             st.warning("Model not loaded. Running in demonstration mode with heuristic analysis.")

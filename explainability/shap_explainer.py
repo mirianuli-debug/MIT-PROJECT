@@ -154,6 +154,7 @@ class PhishingExplainer:
         self,
         text: str,
         top_k: int = 10,
+        use_shap: bool = True,
     ) -> Dict:
         """
         Explain a single text sample using SHAP.
@@ -161,6 +162,9 @@ class PhishingExplainer:
         Args:
             text: Raw input text to explain.
             top_k: Number of top contributing words to return.
+            use_shap: When False, skip the SHAP attribution and return only the
+                prediction. Used as a fallback when the host is short on memory,
+                since SHAP is far more expensive than inference alone.
 
         Returns:
             Dictionary containing:
@@ -183,16 +187,19 @@ class PhishingExplainer:
         pred_label = CLASS_MAPPING[pred_idx]
         probabilities = {name: float(probs[i]) for i, name in enumerate(CLASS_NAMES)}
 
-        # SHAP explanation
-        explainer = self._build_explainer()
-        shap_values = explainer([cleaned])
+        # SHAP explanation (skipped when the host cannot afford it)
+        if use_shap:
+            explainer = self._build_explainer()
+            shap_values = explainer([cleaned])
 
-        # Extract SHAP values for the predicted class
-        sv = shap_values[0, :, pred_idx]
+            # Extract SHAP values for the predicted class
+            sv = shap_values[0, :, pred_idx]
 
-        # Build word-importance pairs
-        tokens = sv.data
-        values = sv.values
+            # Build word-importance pairs
+            tokens = sv.data
+            values = sv.values
+        else:
+            tokens, values = [], []
 
         word_importances: List[Tuple[str, float]] = []
         for token, val in zip(tokens, values):
